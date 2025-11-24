@@ -1,0 +1,25 @@
+services:
+  service.customers:
+    image: ${DOCKER_REGISTRY-}servicecustomers
+    build:
+      context: .
+      dockerfile: Service.Customers/Dockerfile
+    container_name: customers
+    ports:
+      - "5001:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  service.orders:
+    image: ${DOCKER_REGISTRY-}serviceorders
+    build:
+      context: .
+      dockerfile: Service.Orders/Dockerfile
+    container_name: orders
+    ports:
+      - "5002:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - service.customers
+
