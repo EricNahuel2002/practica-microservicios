@@ -22,4 +22,14 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - service.customers
+  gateway:
+    build:
+        context: .
+        dockerfile: ApiGateway/Dockerfile
+    container_name: gateway
+    ports:
+        - "8080:80"
+    depends_on:
+      - service.customers
+      - service.orders
 

@@ -1,9 +1,29 @@
 name: dockercompose14553483144634894451
 services:
+  gateway:
+    build:
+      context: C:\proyectos personales\practica-microservicios\Service.Customers
+      dockerfile: Service.Customers/ApiGateway/Dockerfile
+    container_name: gateway
+    depends_on:
+      service.customers:
+        condition: service_started
+        required: true
+      service.orders:
+        condition: service_started
+        required: true
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "8080"
+        protocol: tcp
   service.customers:
     build:
       context: C:\proyectos personales\practica-microservicios\Service.Customers
       dockerfile: Service.Customers/Dockerfile
+    container_name: customers
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
@@ -12,6 +32,10 @@ services:
     networks:
       default: null
     ports:
+      - mode: ingress
+        target: 5000
+        published: "5001"
+        protocol: tcp
       - mode: ingress
         target: 8080
         protocol: tcp
@@ -47,6 +71,11 @@ services:
     build:
       context: C:\proyectos personales\practica-microservicios\Service.Customers
       dockerfile: Service.Orders/Dockerfile
+    container_name: orders
+    depends_on:
+      service.customers:
+        condition: service_started
+        required: true
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
@@ -55,6 +84,10 @@ services:
     networks:
       default: null
     ports:
+      - mode: ingress
+        target: 5000
+        published: "5002"
+        protocol: tcp
       - mode: ingress
         target: 8080
         protocol: tcp

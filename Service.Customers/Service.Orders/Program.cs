@@ -9,7 +9,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient("customers", client =>
 {
-    client.BaseAddress = new Uri("http://customers:5000/");
+    client.BaseAddress = new Uri("http://gateway:80/");
+    client.Timeout = TimeSpan.FromSeconds(10);
 });
 
 

@@ -1,15 +1,143 @@
 name: dockercompose14553483144634894451
 services:
+  gateway:
+    build:
+      context: C:\proyectos personales\practica-microservicios\Service.Customers
+      dockerfile: ApiGateway/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Debug
+        LAUNCHING_FROM_VS: "true"
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: ApiGateway
+      target: build
+    container_name: gateway
+    depends_on:
+      service.customers:
+        condition: service_started
+        required: true
+      service.orders:
+        condition: service_started
+        required: true
+    entrypoint:
+      - dotnet
+      - --roll-forward
+      - Major
+      - /VSTools/DistrolessHelper/DistrolessHelper.dll
+      - --wait
+    environment:
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      NUGET_FALLBACK_PACKAGES: /.nuget/fallbackpackages
+    image: gateway:dev
+    labels:
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /.nuget/packages --additionalProbingPath /.nuget/fallbackpackages  "/app/bin/Debug/net8.0/ApiGateway.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: dotnet --roll-forward Major /VSTools/DistrolessHelper/DistrolessHelper.dll --stop dotnet
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "8080"
+        protocol: tcp
+    tty: true
+    volumes:
+      - type: bind
+        source: C:\proyectos personales\practica-microservicios\Service.Customers\ApiGateway
+        target: /app
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\proyectos personales\practica-microservicios\Service.Customers
+        target: /src
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\PC\vsdbg\vs2017u5
+        target: /remote_debugger
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\PC\.nuget\packages
+        target: /.nuget/packages
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages
+        target: /.nuget/fallbackpackages
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\PC\AppData\Roaming\ASP.NET\Https
+        target: /root/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\PC\AppData\Roaming\ASP.NET\Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\PC\AppData\Roaming\Microsoft\UserSecrets
+        target: /root/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\PC\AppData\Roaming\Microsoft\UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Sdks\Microsoft.Docker.Sdk\tools\linux-x64\net8.0
+        target: /VSTools
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\HotReload
+        target: /HotReloadAgent
+        read_only: true
+        bind:
+          create_host_path: true
   service.customers:
     build:
       context: C:\proyectos personales\practica-microservicios\Service.Customers
       dockerfile: Service.Customers/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Debug
+        LAUNCHING_FROM_VS: "true"
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: Service.Customers
+      target: build
     container_name: customers
+    entrypoint:
+      - dotnet
+      - --roll-forward
+      - Major
+      - /VSTools/DistrolessHelper/DistrolessHelper.dll
+      - --wait
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
       ASPNETCORE_HTTPS_PORTS: "8081"
-    image: servicecustomers
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      NUGET_FALLBACK_PACKAGES: /.nuget/fallbackpackages
+    image: servicecustomers:dev
+    labels:
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /.nuget/packages --additionalProbingPath /.nuget/fallbackpackages  "/app/bin/Debug/net8.0/Service.Customers.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: dotnet --roll-forward Major /VSTools/DistrolessHelper/DistrolessHelper.dll --stop dotnet
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
     networks:
       default: null
     ports:
@@ -23,28 +151,68 @@ services:
       - mode: ingress
         target: 8081
         protocol: tcp
+    tty: true
     volumes:
       - type: bind
-        source: C:\Users\PC\AppData\Roaming/Microsoft/UserSecrets
+        source: C:\Users\PC\AppData\Roaming\Microsoft\UserSecrets
         target: /home/app/.microsoft/usersecrets
         read_only: true
         bind:
           create_host_path: true
       - type: bind
-        source: C:\Users\PC\AppData\Roaming/Microsoft/UserSecrets
+        source: C:\Users\PC\AppData\Roaming\Microsoft\UserSecrets
         target: /root/.microsoft/usersecrets
         read_only: true
         bind:
           create_host_path: true
       - type: bind
-        source: C:\Users\PC\AppData\Roaming/ASP.NET/Https
+        source: C:\Users\PC\AppData\Roaming\ASP.NET\Https
         target: /home/app/.aspnet/https
         read_only: true
         bind:
           create_host_path: true
       - type: bind
-        source: C:\Users\PC\AppData\Roaming/ASP.NET/Https
+        source: C:\Users\PC\AppData\Roaming\ASP.NET\Https
         target: /root/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\proyectos personales\practica-microservicios\Service.Customers\Service.Customers
+        target: /app
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\proyectos personales\practica-microservicios\Service.Customers
+        target: /src
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\PC\vsdbg\vs2017u5
+        target: /remote_debugger
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\PC\.nuget\packages
+        target: /.nuget/packages
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages
+        target: /.nuget/fallbackpackages
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Sdks\Microsoft.Docker.Sdk\tools\linux-x64\net8.0
+        target: /VSTools
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\HotReload
+        target: /HotReloadAgent
         read_only: true
         bind:
           create_host_path: true
@@ -52,46 +220,112 @@ services:
     build:
       context: C:\proyectos personales\practica-microservicios\Service.Customers
       dockerfile: Service.Orders/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Debug
+        LAUNCHING_FROM_VS: "true"
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: Service.Orders
+      target: build
+    container_name: orders
     depends_on:
       service.customers:
         condition: service_started
         required: true
+    entrypoint:
+      - dotnet
+      - --roll-forward
+      - Major
+      - /VSTools/DistrolessHelper/DistrolessHelper.dll
+      - --wait
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
       ASPNETCORE_HTTPS_PORTS: "8081"
-    image: serviceorders
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      NUGET_FALLBACK_PACKAGES: /.nuget/fallbackpackages
+    image: serviceorders:dev
+    labels:
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /.nuget/packages --additionalProbingPath /.nuget/fallbackpackages  "/app/bin/Debug/net8.0/Service.Orders.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: dotnet --roll-forward Major /VSTools/DistrolessHelper/DistrolessHelper.dll --stop dotnet
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
     networks:
       default: null
     ports:
+      - mode: ingress
+        target: 5000
+        published: "5002"
+        protocol: tcp
       - mode: ingress
         target: 8080
         protocol: tcp
       - mode: ingress
         target: 8081
         protocol: tcp
+    tty: true
     volumes:
       - type: bind
-        source: C:\Users\PC\AppData\Roaming/Microsoft/UserSecrets
+        source: C:\Users\PC\AppData\Roaming\Microsoft\UserSecrets
         target: /home/app/.microsoft/usersecrets
         read_only: true
         bind:
           create_host_path: true
       - type: bind
-        source: C:\Users\PC\AppData\Roaming/Microsoft/UserSecrets
+        source: C:\Users\PC\AppData\Roaming\Microsoft\UserSecrets
         target: /root/.microsoft/usersecrets
         read_only: true
         bind:
           create_host_path: true
       - type: bind
-        source: C:\Users\PC\AppData\Roaming/ASP.NET/Https
+        source: C:\Users\PC\AppData\Roaming\ASP.NET\Https
         target: /home/app/.aspnet/https
         read_only: true
         bind:
           create_host_path: true
       - type: bind
-        source: C:\Users\PC\AppData\Roaming/ASP.NET/Https
+        source: C:\Users\PC\AppData\Roaming\ASP.NET\Https
         target: /root/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\proyectos personales\practica-microservicios\Service.Customers\Service.Orders
+        target: /app
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\proyectos personales\practica-microservicios\Service.Customers
+        target: /src
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\PC\vsdbg\vs2017u5
+        target: /remote_debugger
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\PC\.nuget\packages
+        target: /.nuget/packages
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages
+        target: /.nuget/fallbackpackages
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Sdks\Microsoft.Docker.Sdk\tools\linux-x64\net8.0
+        target: /VSTools
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\HotReload
+        target: /HotReloadAgent
         read_only: true
         bind:
           create_host_path: true

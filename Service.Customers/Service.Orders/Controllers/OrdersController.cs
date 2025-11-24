@@ -31,7 +31,7 @@ namespace Service.Orders.Controllers
             if (order is null) return NotFound();
 
             var client = _httpClientFactory.CreateClient("customers");
-            var resp = await client.GetAsync($"/api/customers/{order.CustomerId}");
+            var resp = await client.GetAsync($"customers/{order.CustomerId}");
             if (!resp.IsSuccessStatusCode) return StatusCode((int)resp.StatusCode, "Error calling customers service");
 
             using var stream = await resp.Content.ReadAsStreamAsync();
